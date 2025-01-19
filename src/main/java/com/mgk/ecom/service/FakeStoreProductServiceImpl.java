@@ -1,6 +1,7 @@
 package com.mgk.ecom.service;
 
 import com.mgk.ecom.dto.FakeStoreProductDto;
+import com.mgk.ecom.exception.ProductNotFoundException;
 import com.mgk.ecom.model.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,16 +20,18 @@ public class FakeStoreProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Product getProductById(long id) {
+    public Product getProductById(long id) throws ProductNotFoundException {
         System.out.println("Inside FK product service");
         FakeStoreProductDto fakeStoreProductDto = restTemplate.getForObject("https://fakestoreapi.com/products/" + id, FakeStoreProductDto.class);
-        System.out.println(fakeStoreProductDto.toString());
+        if(fakeStoreProductDto == null){
+            throw new ProductNotFoundException("Product with ID: "+ id+" NOT FOUND");
+        }
         return fakeStoreProductDto.getProduct();
     }
 
     @Override
     public List<Product> getProducts() {
-        FakeStoreProductDto[] fakeStoreProductDtos = restTemplate.getForObject("https://fakestoreapi.com/products/", FakeStoreProductDto[].class);
+        FakeStoreProductDto[] fakeStoreProductDtos = restTemplate.getForObject("https://fakestoreapi.com/products        /", FakeStoreProductDto[].class);
 
         return Arrays.stream(fakeStoreProductDtos)
                 .map(FakeStoreProductDto::getProduct)

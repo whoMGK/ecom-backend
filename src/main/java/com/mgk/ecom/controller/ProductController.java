@@ -1,7 +1,11 @@
 package com.mgk.ecom.controller;
 
+import com.mgk.ecom.dto.ErrorDto;
+import com.mgk.ecom.exception.ProductNotFoundException;
 import com.mgk.ecom.model.Product;
 import com.mgk.ecom.service.ProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,9 +31,12 @@ public class ProductController {
     }
 
     @GetMapping("/products/{id}")
-    public Product getProductById(@PathVariable("id") Long id) {
+    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) throws ProductNotFoundException {
         Product p = productService.getProductById(id);
-        return p;
+        ResponseEntity<Product> response = new ResponseEntity<>(
+                p, HttpStatus.OK
+        );
+        return response;
     }
 
     @PutMapping("/products/{id}")
@@ -41,4 +48,18 @@ public class ProductController {
     public void deleteProduct(@PathVariable("id") Long id) {
         productService.deleteProduct(id);
     }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleProductNotFoundException(Exception e){
+        ErrorDto errorDto = new ErrorDto();
+        errorDto.setMessage(e.getMessage());
+
+        ResponseEntity<ErrorDto> response = new ResponseEntity<>(
+                errorDto, HttpStatus.NOT_FOUND
+        );
+        return response;
+    }
+
 }
+
+
