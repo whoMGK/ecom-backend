@@ -1,24 +1,25 @@
 package com.mgk.ecom.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+public class Product extends BaseModel{
 
-public class Product {
-    private Long id;
     private String title;
     private String description;
     private Double price;
+    @ManyToOne
     private Category category;
     private String imageURL;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;
