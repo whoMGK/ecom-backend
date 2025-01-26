@@ -1,9 +1,6 @@
 package com.mgk.ecom.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,10 +19,18 @@ public class BaseModel {
     private Long id;
     private Date createdAt;
     private Date updatedAt;
-    private boolean deletedAt;
+    private boolean isDeleted;
 
     public Date getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public void setCreatedAt(Date createdAt) {
@@ -40,13 +45,7 @@ public class BaseModel {
         this.id = id;
     }
 
-    public boolean isDeletedAt() {
-        return deletedAt;
-    }
 
-    public void setDeletedAt(boolean deletedAt) {
-        this.deletedAt = deletedAt;
-    }
 
     public Date getUpdatedAt() {
         return updatedAt;
@@ -54,5 +53,17 @@ public class BaseModel {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
+        this.isDeleted = false; // Default to false when creating
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = new Date();
     }
 }
