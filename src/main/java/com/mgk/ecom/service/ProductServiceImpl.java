@@ -23,27 +23,22 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product getProductById(long id) throws ProductNotFoundException {
-        return null;
+         return productRepository.findById(id).orElseThrow(()-> new ProductNotFoundException("Product not found"));
     }
 
     @Override
-    public List<Product> getProducts() {
-        return List.of();
+    public List<Product> getProducts() throws ProductNotFoundException {
+        List<Product> products = productRepository.findAll();
+        if(products.isEmpty()){
+            throw new ProductNotFoundException("No products found");
+        }
+        return products;
     }
 
     @Override
     public Product createProduct(Product product) {
         String title = product.getCategory().getTitle();
-        Optional<Category> currentCategory = categoryRepository.findByTitle(title);
-        if(currentCategory.isEmpty()){
-            Category newCategory = new Category();
-            newCategory.setTitle(title);
-            categoryRepository.save(newCategory);
-            product.setCategory(newCategory);
-        } else{
-            Category existingCategory = currentCategory.get();
-            product.setCategory(existingCategory);
-        }
+        product.setCategory(findOrCreateCategory(title));
         return productRepository.save(product);
     }
 
@@ -55,5 +50,13 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public void deleteProduct(Long id) {
 
+    }
+
+    private Category findOrCreateCategory(String title) {
+        return categoryRepository.findByTitle(title).orElseGet(()->{
+           Category newCategory = new Category();
+           newCategory.setTitle(title);
+           return categoryRepository.save(newCategory);
+        });
     }
 }
